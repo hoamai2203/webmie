@@ -98,9 +98,9 @@ const ProductDetailsSection = (props) => {
     <Fragment>
       <Submenu
         value={{
-          categoryId: sProduct.pCategory._id,
+          categoryId: sProduct._id,
           product: sProduct.pName,
-          category: sProduct.pCategory.cName,
+          category: sProduct.cName,
         }}
       />
       <section className="m-4 md:mx-12 md:my-6">

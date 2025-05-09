@@ -3,7 +3,7 @@ const categoryModel = require("../models/categories");
 const productModel = require("../models/products");
 const orderModel = require("../models/orders");
 const userModel = require("../models/users");
-const customizeModel = require("../models/customize");
+const customizeModel = require("../models/customize");   
 
 class Customize {
   async getImages(req, res) {

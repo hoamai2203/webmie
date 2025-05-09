@@ -63,12 +63,12 @@ app.use(express.json());
 
 // Routes
 app.use("/api", authRouter);
-app.use("/api/user", usersRouter);
-app.use("/api/category", categoryRouter);
+app.use("/api/user", usersRouter);  //localhost:8000/api/user
+app.use("/api/category", categoryRouter);  //localhost:8000/api/category
 app.use("/api/product", productRouter);
 app.use("/api", brainTreeRouter);
 app.use("/api/order", orderRouter);
-app.use("/api/customize", customizeRouter);
+app.use("/api/customize", customizeRouter); //localhost:8000/api/customize
 
 // Run Server
 const PORT = process.env.PORT || 8000;

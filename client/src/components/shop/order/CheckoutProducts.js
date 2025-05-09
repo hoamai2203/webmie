@@ -4,7 +4,8 @@ import { LayoutContext } from "../layout";
 import { subTotal, quantity, totalCost } from "../partials/Mixins";
 
 import { cartListProduct } from "../partials/FetchApi";
-import { getBrainTreeToken, getPaymentProcess } from "./FetchApi";
+// Thêm createOrder vào import FetchApi
+import { getBrainTreeToken, getPaymentProcess, createOrder } from "./FetchApi";
 import { fetchData, fetchbrainTree, pay } from "./Action";
 
 import DropIn from "braintree-web-drop-in-react";
@@ -113,31 +114,37 @@ export const CheckoutComponent = (props) => {
                       placeholder="+880"
                     />
                   </div>
-                  <DropIn
-                    options={{
-                      authorization: state.clientToken,
-                      paypal: {
-                        flow: "vault",
-                      },
-                    }}
-                    onInstance={(instance) => (state.instance = instance)}
-                  />
                   <div
-                    onClick={(e) =>
-                      pay(
-                        data,
-                        dispatch,
-                        state,
-                        setState,
-                        getPaymentProcess,
-                        totalCost,
-                        history
-                      )
-                    }
+                    onClick={async () => {
+                      if (!state.address || !state.phone) {
+                        setState({ ...state, error: "Please provide delivery address and phone" });
+                        return;
+                      }
+                      
+                      try {
+                        const response = await createOrder({
+                          allProduct: data.cartProduct,
+                          address: state.address,
+                          phone: state.phone,
+                          user: JSON.parse(localStorage.getItem("jwt")).user._id,
+                          status: "Processing"
+                        });
+                      
+                        if (response.success) {
+                          dispatch({ type: "cartProduct", payload: null }); // Clear cart
+                          dispatch({ type: "cartTotalCost", payload: null });
+                          setState({ ...state, success: true });
+                          history.push("/user/orders");
+                        }
+                      } catch (error) {
+                        console.log(error);
+                        setState({ ...state, error: "Order creation failed" });
+                      }
+                    }}
                     className="w-full px-4 py-2 text-center text-white font-semibold cursor-pointer"
                     style={{ background: "#303031" }}
                   >
-                    Pay now
+                    Order Now
                   </div>
                 </div>
               </Fragment>

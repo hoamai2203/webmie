@@ -8,6 +8,9 @@ const apiURL = process.env.REACT_APP_API_URL;
 const AllProduct = (props) => {
   const { data, dispatch } = useContext(ProductContext);
   const { products } = data;
+  console.log(products);
+
+
 
   const [loading, setLoading] = useState(false);
 
@@ -19,6 +22,7 @@ const AllProduct = (props) => {
   const fetchData = async () => {
     setLoading(true);
     let responseData = await getAllProduct();
+    console.log(responseData);
     setTimeout(() => {
       if (responseData && responseData.Products) {
         dispatch({
@@ -154,7 +158,9 @@ const ProductTable = ({ product, deleteProduct, editProduct }) => {
             </span>
           )}
         </td>
+        {console.log(product)}
         <td className="p-2 text-center">{product.pQuantity}</td>
+        console.log("Category Name:", product.pCategory?.cName);
         <td className="p-2 text-center">{product.pCategory.cName}</td>
         <td className="p-2 text-center">{product.pOffer}</td>
         <td className="p-2 text-center">

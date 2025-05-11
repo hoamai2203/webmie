@@ -1,36 +1,36 @@
-import React, { Fragment, useEffect, useContext, useState } from "react";
-import { useHistory } from "react-router-dom";
-import { LayoutContext } from "../layout";
-import { subTotal, quantity, totalCost } from "../partials/Mixins";
+import React, { Fragment, useEffect, useContext, useState } from 'react'
+import { useHistory } from 'react-router-dom'
+import { LayoutContext } from '../layout'
+import { subTotal, quantity, totalCost } from '../partials/Mixins'
 
-import { cartListProduct } from "../partials/FetchApi";
+import { cartListProduct } from '../partials/FetchApi'
 // Thêm createOrder vào import FetchApi
-import { getBrainTreeToken, getPaymentProcess, createOrder } from "./FetchApi";
-import { fetchData, fetchbrainTree, pay } from "./Action";
+import { getBrainTreeToken, getPaymentProcess, createOrder } from './FetchApi'
+import { fetchData, fetchbrainTree, pay } from './Action'
 
-import DropIn from "braintree-web-drop-in-react";
+import DropIn from 'braintree-web-drop-in-react'
 
-const apiURL = process.env.REACT_APP_API_URL;
+const apiURL = process.env.REACT_APP_API_URL
 
 export const CheckoutComponent = (props) => {
-  const history = useHistory();
-  const { data, dispatch } = useContext(LayoutContext);
+  const history = useHistory()
+  const { data, dispatch } = useContext(LayoutContext)
 
   const [state, setState] = useState({
-    address: "",
-    phone: "",
+    address: '',
+    phone: '',
     error: false,
     success: false,
     clientToken: null,
-    instance: {},
-  });
+    instance: {}
+  })
 
   useEffect(() => {
-    fetchData(cartListProduct, dispatch);
-    fetchbrainTree(getBrainTreeToken, setState);
+    fetchData(cartListProduct, dispatch)
+    fetchbrainTree(getBrainTreeToken, setState)
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [])
 
   if (data.loading) {
     return (
@@ -51,7 +51,7 @@ export const CheckoutComponent = (props) => {
         </svg>
         Please wait untill finish
       </div>
-    );
+    )
   }
   return (
     <Fragment>
@@ -74,7 +74,7 @@ export const CheckoutComponent = (props) => {
                       {state.error}
                     </div>
                   ) : (
-                    ""
+                    ''
                   )}
                   <div className="flex flex-col py-2">
                     <label htmlFor="address" className="pb-2">
@@ -86,7 +86,7 @@ export const CheckoutComponent = (props) => {
                         setState({
                           ...state,
                           address: e.target.value,
-                          error: false,
+                          error: false
                         })
                       }
                       type="text"
@@ -105,7 +105,7 @@ export const CheckoutComponent = (props) => {
                         setState({
                           ...state,
                           phone: e.target.value,
-                          error: false,
+                          error: false
                         })
                       }
                       type="number"
@@ -117,32 +117,37 @@ export const CheckoutComponent = (props) => {
                   <div
                     onClick={async () => {
                       if (!state.address || !state.phone) {
-                        setState({ ...state, error: "Please provide delivery address and phone" });
-                        return;
+                        setState({
+                          ...state,
+                          error: 'Please provide delivery address and phone'
+                        })
+                        return
                       }
-                      
+
                       try {
                         const response = await createOrder({
-                          allProduct: data.cartProduct,
+                          allProduct: JSON.parse(localStorage.getItem('cart')),
+                          user: JSON.parse(localStorage.getItem('jwt')).user
+                            ._id,
                           address: state.address,
-                          phone: state.phone,
-                          user: JSON.parse(localStorage.getItem("jwt")).user._id,
-                          status: "Processing"
-                        });
-                      
+                          phone: state.phone
+                        })
+
                         if (response.success) {
-                          dispatch({ type: "cartProduct", payload: null }); // Clear cart
-                          dispatch({ type: "cartTotalCost", payload: null });
-                          setState({ ...state, success: true });
-                          history.push("/user/orders");
+                          localStorage.setItem('cart', JSON.stringify([]))
+                          dispatch({ type: 'cartProduct', payload: null })
+                          dispatch({ type: 'cartTotalCost', payload: null })
+                          dispatch({ type: 'orderSuccess', payload: true })
+                          setState({ ...state, success: true })
+                          history.push('/')
                         }
                       } catch (error) {
-                        console.log(error);
-                        setState({ ...state, error: "Order creation failed" });
+                        console.log(error)
+                        setState({ ...state, error: 'Order creation failed' })
                       }
                     }}
                     className="w-full px-4 py-2 text-center text-white font-semibold cursor-pointer"
-                    style={{ background: "#303031" }}
+                    style={{ background: '#303031' }}
                   >
                     Order Now
                   </div>
@@ -170,11 +175,11 @@ export const CheckoutComponent = (props) => {
         </div>
       </section>
     </Fragment>
-  );
-};
+  )
+}
 
 const CheckoutProducts = ({ products }) => {
-  const history = useHistory();
+  const history = useHistory()
 
   return (
     <Fragment>
@@ -197,7 +202,7 @@ const CheckoutProducts = ({ products }) => {
                     {product.pName}
                   </div>
                   <div className="md:ml-6 font-semibold text-gray-600 text-sm">
-                    Price : ${product.pPrice}.00{" "}
+                    Price : ${product.pPrice}.00{' '}
                   </div>
                   <div className="md:ml-6 font-semibold text-gray-600 text-sm">
                     Quantitiy : {quantity(product._id)}
@@ -207,14 +212,14 @@ const CheckoutProducts = ({ products }) => {
                   </div>
                 </div>
               </div>
-            );
+            )
           })
         ) : (
           <div>No product found for checkout</div>
         )}
       </div>
     </Fragment>
-  );
-};
+  )
+}
 
-export default CheckoutProducts;
+export default CheckoutProducts
